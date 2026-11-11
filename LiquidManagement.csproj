@@ -1,0 +1,173 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--Path to the game. Override on the command line with -p:TheLongDarkPath=...-->
+    <TheLongDarkPath Condition="'$(TheLongDarkPath)' == '' And '$(OS)' == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\TheLongDark</TheLongDarkPath>
+    <TheLongDarkPath Condition="'$(TheLongDarkPath)' == ''">$(HOME)/.local/share/Steam/steamapps/common/TheLongDark</TheLongDarkPath>
+  </PropertyGroup>
+
+  <!--Mod name, version and author live only here: the MelonInfo attribute and the BuildInfo.json in
+      the .modcomponent are generated from them.-->
+  <PropertyGroup>
+    <AssemblyName>LiquidManagement</AssemblyName>
+    <RootNamespace>LiquidManagement</RootNamespace>
+    <Version>0.1.0</Version>
+    <Authors>Reno98</Authors>
+    <Copyright>Created by Reno98</Copyright>
+    <RepositoryUrl>https://github.com/renpre98/LiquidManagement</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="MelonLoader.MelonInfoAttribute">
+      <_Parameter1>typeof(LiquidManagement.LiquidManagementMain)</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      <_Parameter2>$(AssemblyName)</_Parameter2>
+      <_Parameter3>$(Version)</_Parameter3>
+      <_Parameter4>$(Authors)</_Parameter4>
+      <_Parameter5>$(RepositoryUrl)</_Parameter5>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="MelonLoader.MelonGameAttribute">
+      <_Parameter1>Hinterland</_Parameter1>
+      <_Parameter2>TheLongDark</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DebugType>none</DebugType>
+    <!--Polyfill in BuildSupport/ replaces the NullableAttribute that Unity 6's CoreModule exposes.-->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+  </PropertyGroup>
+
+  <!--Compile against the game's own MelonLoader-generated assemblies so API changes show up as compile errors.-->
+  <ItemDefinitionGroup>
+    <Reference>
+      <Private>False</Private>
+    </Reference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/MelonLoader.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/0Harmony.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/Il2CppInterop.Runtime.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/Il2CppInterop.Common.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/Il2CppAssemblies/*.dll" />
+    <Reference Include="$(TheLongDarkPath)/Mods/ModSettings.dll" />
+  </ItemGroup>
+
+  <!--Texts: every Distributable/localizations/*.json must parse (Better Water Management 5.2.0 shipped one with a
+      missing comma, and ModComponent then dropped all its texts), every entry needs English and German, no key twice,
+      and every LM_ key used in the code or the item files must exist. Runs before the build, fails it on a problem.-->
+  <UsingTask TaskName="CheckLocalization" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <LocalizationFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <UsageFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <!--the same JSON parser ModComponent reads the texts with, shipped with MSBuild-->
+      <Reference Include="$(MSBuildToolsPath)/Newtonsoft.Json.dll" />
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Using Namespace="Newtonsoft.Json" />
+      <Using Namespace="Newtonsoft.Json.Linq" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var known = new HashSet<string>(StringComparer.Ordinal);
+        string[] required = { "English", "German" };
+        var load = new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error, LineInfoHandling = LineInfoHandling.Load };
+        foreach (var item in LocalizationFiles)
+        {
+            string file = item.ItemSpec;
+            JToken root;
+            try
+            {
+                root = JToken.Parse(File.ReadAllText(file), load);
+            }
+            catch (JsonReaderException e)
+            {
+                Log.LogError(null, null, null, file, e.LineNumber, e.LinePosition, 0, 0, "localization: not valid JSON (ModComponent would drop all texts): " + e.Message);
+                continue;
+            }
+            if (!(root is JObject entries))
+            {
+                Log.LogError(null, null, null, file, 1, 1, 0, 0, "localization: the root must be an object of keys");
+                continue;
+            }
+            foreach (JProperty entry in entries.Properties())
+            {
+                var at = (IJsonLineInfo)entry;
+                if (!known.Add(entry.Name))
+                {
+                    Log.LogError(null, null, null, file, at.LineNumber, at.LinePosition, 0, 0, "localization: key " + entry.Name + " also in another file");
+                }
+                if (!(entry.Value is JObject languages))
+                {
+                    Log.LogError(null, null, null, file, at.LineNumber, at.LinePosition, 0, 0, "localization: " + entry.Name + " is not an object of languages");
+                    continue;
+                }
+                foreach (string language in required)
+                {
+                    if (!(languages[language] is JValue text) || text.Type != JTokenType.String || string.IsNullOrWhiteSpace((string)text))
+                    {
+                        Log.LogError(null, null, null, file, at.LineNumber, at.LinePosition, 0, 0, "localization: " + entry.Name + " has no " + language + " text");
+                    }
+                }
+            }
+        }
+        var keyPattern = new Regex("\"(LM_[A-Za-z0-9_]+)\"");
+        foreach (var item in UsageFiles)
+        {
+            string file = item.ItemSpec;
+            string[] lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                foreach (Match m in keyPattern.Matches(lines[i]))
+                {
+                    if (!known.Contains(m.Groups[1].Value))
+                    {
+                        Log.LogError(null, null, null, file, i + 1, m.Index + 1, 0, 0, "localization: no text for " + m.Groups[1].Value);
+                    }
+                }
+            }
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="CheckLocalization" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_LocalizationFile Include="$(MSBuildProjectDirectory)/Distributable/localizations/*.json" />
+      <_LocalizationUse Include="$(MSBuildProjectDirectory)/src/**/*.cs" />
+      <_LocalizationUse Include="$(MSBuildProjectDirectory)/Distributable/**/*.json" Exclude="@(_LocalizationFile)" />
+    </ItemGroup>
+    <CheckLocalization LocalizationFiles="@(_LocalizationFile)" UsageFiles="@(_LocalizationUse)" />
+  </Target>
+
+  <!--Pack Distributable/ (localization, later items) plus a generated BuildInfo.json into the .modcomponent next to
+      the dll.-->
+  <Target Name="PackModComponent" AfterTargets="Build">
+    <PropertyGroup>
+      <ModComponentStaging>$(IntermediateOutputPath)modcomponent/</ModComponentStaging>
+    </PropertyGroup>
+    <ItemGroup>
+      <ModComponentFile Include="$(MSBuildProjectDirectory)/Distributable/**/*" />
+      <BuildInfoLine Include="{" />
+      <BuildInfoLine Include="    &quot;Name&quot;: &quot;$(AssemblyName)&quot;," />
+      <BuildInfoLine Include="    &quot;Version&quot;: &quot;$(Version)&quot;," />
+      <BuildInfoLine Include="    &quot;Author&quot;: &quot;$(Authors)&quot;" />
+      <BuildInfoLine Include="}" />
+    </ItemGroup>
+    <RemoveDir Directories="$(ModComponentStaging)" />
+    <Copy SourceFiles="@(ModComponentFile)" DestinationFiles="@(ModComponentFile->'$(ModComponentStaging)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <WriteLinesToFile File="$(ModComponentStaging)BuildInfo.json" Lines="@(BuildInfoLine)" Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(ModComponentStaging)" DestinationFile="$(TargetDir)$(AssemblyName).modcomponent" Overwrite="true" />
+  </Target>
+
+  <Target Name="CopyToMods" AfterTargets="PackModComponent" Condition="'$(CopyToMods)' == 'true'">
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(AssemblyName).modcomponent" DestinationFolder="$(TheLongDarkPath)/Mods" />
+  </Target>
+
+</Project>

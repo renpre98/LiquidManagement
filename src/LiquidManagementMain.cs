@@ -15,6 +15,19 @@ public sealed class LiquidManagementMain : MelonMod
     {
         Log = LoggerInstance;
         Settings.OnLoad();
+        uConsole.RegisterCommand("lm_transfer", new Action(TransferMenu.Command));
+    }
+
+    public override void OnUpdate()
+    {
+        try
+        {
+            TransferMenu.Update();
+        }
+        catch (Exception e)
+        {
+            LogErrorOnce("update", e);
+        }
     }
 
     internal static bool IsMenu()

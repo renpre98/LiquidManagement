@@ -2,5 +2,33 @@
     "LM_ModName": {
         "English": "Liquid Management",
         "German": "Liquid Management"
+    },
+    "LM_Pour": {
+        "English": "Pour",
+        "German": "Umfüllen"
+    },
+    "LM_TransferTitle": {
+        "English": "Pour {0}",
+        "German": "{0} umfüllen"
+    },
+    "LM_From": {
+        "English": "From",
+        "German": "Aus"
+    },
+    "LM_To": {
+        "English": "Into",
+        "German": "In"
+    },
+    "LM_Pouring": {
+        "English": "Pouring",
+        "German": "Umfüllen"
+    },
+    "LM_Poured": {
+        "English": "{0} {1} poured",
+        "German": "{0} {1} umgefüllt"
+    },
+    "LM_NothingToPour": {
+        "English": "Nothing to pour",
+        "German": "Nichts zum Umfüllen"
     }
 }

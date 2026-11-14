@@ -60,9 +60,9 @@ internal static class TransferMenu
     }
 
     /// <summary>Opens the menu. <paramref name="preferred"/> is the vessel it was opened for (examined): the source
-    /// when it holds something to pour, else the target. A fixed source (a car's tank) or target (a machine's tank)
-    /// cannot be switched.</summary>
-    internal static void Open(List<Vessel> vessels, Vessel? preferred, Vessel? fixedSource, Vessel? fixedTarget, EnablePanelOnExit back)
+    /// when it holds something to pour, else the target. <paramref name="onlySources"/> limits the sources (a car's
+    /// tank, the liquids of a machine's tank); a fixed target (a machine's tank) cannot be switched.</summary>
+    internal static void Open(List<Vessel> vessels, Vessel? preferred, List<Vessel>? onlySources, Vessel? fixedTarget, EnablePanelOnExit back)
     {
         if (s_Active)
         {
@@ -71,7 +71,7 @@ internal static class TransferMenu
         s_Vessels = vessels;
         s_FixedTarget = fixedTarget;
         s_Back = back;
-        s_Sources = vessels.Where(v => v != fixedTarget && (fixedSource == null || v == fixedSource) && !v.IsEmpty && v.Liquid != null
+        s_Sources = vessels.Where(v => v != fixedTarget && (onlySources == null || onlySources.Contains(v)) && !v.IsEmpty && v.Liquid != null
             && (fixedTarget != null ? Pourable(v, fixedTarget) : vessels.Any(t => t != v && Pourable(v, t)))).ToList();
         if (s_Sources.Count == 0)
         {
@@ -473,9 +473,12 @@ internal static class TransferMenu
         {
             return;
         }
-        panel.m_Label_Title.text = string.Format(Localization.Get("LM_TransferTitle"), Liquids.DisplayName(source.Liquid));
+        panel.m_Label_Title.text = target.IsMachine
+            ? string.Format(Localization.Get("LM_FillTitle"), target.Name)
+            : string.Format(Localization.Get("LM_TransferTitle"), Liquids.DisplayName(source.Liquid));
         panel.m_Label_Description.text = "";
-        Texture? icon = source.Icon;
+        // a machine's tank has no icon of its own: the container's
+        Texture? icon = source.Icon ?? target.Icon;
         if (icon != null)
         {
             panel.m_GearIcon.mainTexture = icon;

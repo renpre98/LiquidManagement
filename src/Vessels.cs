@@ -22,6 +22,9 @@ internal abstract class Vessel
     internal long SpaceUnits => Math.Max(0L, CapacityUnits - Units);
     internal bool IsEmpty => Units <= 0L;
 
+    /// <summary>A machine's tank of another mod (MachineTankApi): the menu is titled after it ("Fill Generator").</summary>
+    internal virtual bool IsMachine => false;
+
     /// <summary>Shown with its capacity in the menu ("2.0 / 4.0 l"); a car's tank shows only what is in it.</summary>
     internal virtual bool ShowsCapacity => true;
 

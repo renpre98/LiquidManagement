@@ -227,7 +227,7 @@ internal static class CarTanks
                 Fail("LM_NoLanternFuelSpace");
                 return;
             }
-            TransferMenu.Open(vessels, tank, tank, null, EnablePanelOnExit.None);
+            TransferMenu.Open(vessels, tank, new List<Vessel> { tank }, null, EnablePanelOnExit.None);
         }
         catch (Exception e)
         {

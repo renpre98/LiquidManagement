@@ -16,10 +16,12 @@ Work in progress. Works so far:
   menu opens with the tank as the source; choose the container and the amount, a liter a game minute. Each tank holds
   5-20 l of lantern fuel (settings), found the first time it is siphoned and kept in the save. This came from the
   Generator Mod; the fuel covers were found by Modelfinder.
+- Machines of other mods: the Generator Mod's generator (it requires Liquid Management) opens the transfer menu with
+  its drum as the target to refuel it (whale oil or lantern fuel), and as the source to fill the fuel back into your
+  containers (once for each fuel of the mix, each into its own containers); container and amount by choice.
 
 Planned:
 
-- Phase 1, fuel: refuelling machines of other mods by choice (the Generator Mod's generator first).
 - Phase 2, water: potable or non-potable water in bottles (one at a time, never mixed); carried water limited by the
   bottles' capacity; the game's water bottles stay bottles.
 - Phase 3: refuel the lamp by key, put out fires with water, spawn settings.
@@ -34,6 +36,13 @@ The hose's item shell and icons (`Distributable/bundle`) are built with the Unit
 (Unity 6000.0.60f1, `./build.sh`); its look is made at runtime (`src/HoseGeometry.cs`), so no game geometry is shipped.
 
 Requires ModComponent, ModSettings and ModData.
+
+## For mod authors
+
+`LiquidManagement.MachineTankApi` puts a machine's tank into the transfer menu: `OpenFill(name, accepts, liters,
+capacityLiters, add)` fills it from the player's containers, `OpenPourOut(name, liquids, liters, take, add)` pours it
+back into them. Reference `LiquidManagement.dll` (the Generator Mod does), or find the type by reflection and check
+`MachineTankApi.Version` (now 2) to keep Liquid Management optional for your mod.
 
 ## Credits
 

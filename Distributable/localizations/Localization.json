@@ -62,5 +62,13 @@
     "LM_Siphoned": {
         "English": "{0} {1} siphoned",
         "German": "{0} {1} abgesaugt"
+    },
+    "LM_FillTitle": {
+        "English": "Fill {0}",
+        "German": "{0} befüllen"
+    },
+    "LM_TankFull": {
+        "English": "The tank is full.",
+        "German": "Der Tank ist voll."
     }
 }

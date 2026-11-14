@@ -60,8 +60,9 @@ internal static class TransferMenu
     }
 
     /// <summary>Opens the menu. <paramref name="preferred"/> is the vessel it was opened for (examined): the source
-    /// when it holds something to pour, else the target. A fixed target (a machine's tank) cannot be switched.</summary>
-    internal static void Open(List<Vessel> vessels, Vessel? preferred, Vessel? fixedTarget, EnablePanelOnExit back)
+    /// when it holds something to pour, else the target. A fixed source (a car's tank) or target (a machine's tank)
+    /// cannot be switched.</summary>
+    internal static void Open(List<Vessel> vessels, Vessel? preferred, Vessel? fixedSource, Vessel? fixedTarget, EnablePanelOnExit back)
     {
         if (s_Active)
         {
@@ -70,7 +71,7 @@ internal static class TransferMenu
         s_Vessels = vessels;
         s_FixedTarget = fixedTarget;
         s_Back = back;
-        s_Sources = vessels.Where(v => v != fixedTarget && !v.IsEmpty && v.Liquid != null
+        s_Sources = vessels.Where(v => v != fixedTarget && (fixedSource == null || v == fixedSource) && !v.IsEmpty && v.Liquid != null
             && (fixedTarget != null ? Pourable(v, fixedTarget) : vessels.Any(t => t != v && Pourable(v, t)))).ToList();
         if (s_Sources.Count == 0)
         {
@@ -216,7 +217,7 @@ internal static class TransferMenu
         LiquidType liquid = source.Liquid;
         long units = amount.m_Units;
         float liters = Liquids.ToLiters(units);
-        Work("LM_Pouring", Math.Max(1f, liters), () => Pour(source, target, liquid, units));
+        Work(source.WorkTextKey, Math.Max(source.MinimumMinutes, liters), () => Pour(source, target, liquid, units));
     }
 
     // In its generic mode the game's menu does not bring back the panel it came from (ExitInterface skips that for
@@ -287,7 +288,7 @@ internal static class TransferMenu
         {
             source.Add(liquid, taken - put);
         }
-        HUDMessage.AddMessage(string.Format(Localization.Get("LM_Poured"), Liquids.Format(put), Liquids.DisplayName(liquid)));
+        HUDMessage.AddMessage(string.Format(Localization.Get(source.DoneTextKey), Liquids.Format(put), Liquids.DisplayName(liquid)));
         LiquidManagementMain.LogDebug($"Poured {Liquids.ToLiters(put):0.000} l {Liquids.Name(liquid)}: {source.Name} -> {target.Name}");
         Panel_Inventory_Examine examine = InterfaceManager.GetPanel<Panel_Inventory_Examine>();
         if (examine != null && examine.IsEnabled())
@@ -459,7 +460,9 @@ internal static class TransferMenu
 
     private static string Describe(Vessel vessel)
     {
-        return $"{vessel.Name}  {Liquids.FormatNumber(vessel.Units)} / {Liquids.Format(vessel.CapacityUnits)}";
+        return vessel.ShowsCapacity
+            ? $"{vessel.Name}  {Liquids.FormatNumber(vessel.Units)} / {Liquids.Format(vessel.CapacityUnits)}"
+            : $"{vessel.Name}  {Liquids.Format(vessel.Units)}";
     }
 
     // after the game's own refresh (its texts are about water): our title, icon and rows
@@ -648,6 +651,6 @@ internal static class TransferMenu
     internal static void Command()
     {
         List<Vessel> vessels = ContainerVessel.InInventory().Cast<Vessel>().ToList();
-        Open(vessels, null, null, EnablePanelOnExit.None);
+        Open(vessels, null, null, null, EnablePanelOnExit.None);
     }
 }

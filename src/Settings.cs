@@ -21,6 +21,22 @@ internal sealed class LiquidSettings : JsonModSettings
     [Choice("Auto", "0.05 l", "0.1 l", "0.25 l", "0.5 l")]
     public int AmountStep = 0;
 
+    [Section("Car tanks")]
+
+    [Name("Siphon car tanks")]
+    [Description("With a siphon hose (made at a workbench from cured gut), lantern fuel can be siphoned out of a car's tank behind its open fuel cover. Off: no siphoning, and the hose's recipe is hidden. Some find it too easy.")]
+    public bool Siphoning = true;
+
+    [Name("Fuel in a car, least")]
+    [Description("Lantern fuel a car's tank holds at least, in liters. Each tank is found with a random amount between least and most, the first time it is siphoned.")]
+    [Slider(0f, 40f, 41)]
+    public float CarFuelMin = 5f;
+
+    [Name("Fuel in a car, most")]
+    [Description("Lantern fuel a car's tank holds at most, in liters.")]
+    [Slider(0f, 40f, 41)]
+    public float CarFuelMax = 20f;
+
     [Section("Debug")]
 
     [Name("Debug log")]

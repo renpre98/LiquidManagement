@@ -30,5 +30,37 @@
     "LM_NothingToPour": {
         "English": "Nothing to pour",
         "German": "Nichts zum Umfüllen"
+    },
+    "LM_Item_Hose": {
+        "English": "Siphon Hose",
+        "German": "Saugschlauch"
+    },
+    "LM_Item_Hose_Desc": {
+        "English": "A length of cured gut, sewn into a hose. Open a car's fuel cover to siphon lantern fuel out of its tank into your containers.",
+        "German": "Ein Stück getrockneter Darm, zu einem Schlauch vernäht. Öffne den Tankdeckel eines Autos, um Lampenöl aus dem Tank in deine Behälter zu saugen."
+    },
+    "LM_CarTank": {
+        "English": "Fuel Tank",
+        "German": "Tank"
+    },
+    "LM_CarTankEmpty": {
+        "English": "The tank is dry.",
+        "German": "Der Tank ist leer."
+    },
+    "LM_NeedHose": {
+        "English": "You need a siphon hose.",
+        "German": "Du brauchst einen Saugschlauch."
+    },
+    "LM_NoLanternFuelSpace": {
+        "English": "You have no room for lantern fuel in your containers.",
+        "German": "In deinen Behältern ist kein Platz für Lampenöl."
+    },
+    "LM_Siphoning": {
+        "English": "Siphoning fuel",
+        "German": "Kraftstoff absaugen"
+    },
+    "LM_Siphoned": {
+        "English": "{0} {1} siphoned",
+        "German": "{0} {1} abgesaugt"
     }
 }

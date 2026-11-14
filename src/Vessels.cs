@@ -22,6 +22,16 @@ internal abstract class Vessel
     internal long SpaceUnits => Math.Max(0L, CapacityUnits - Units);
     internal bool IsEmpty => Units <= 0L;
 
+    /// <summary>Shown with its capacity in the menu ("2.0 / 4.0 l"); a car's tank shows only what is in it.</summary>
+    internal virtual bool ShowsCapacity => true;
+
+    /// <summary>The progress bar's text when this is the source, and the message when done ("{0} {1} poured").</summary>
+    internal virtual string WorkTextKey => "LM_Pouring";
+    internal virtual string DoneTextKey => "LM_Poured";
+
+    /// <summary>Pouring takes a game minute a liter, at least this long with this as the source.</summary>
+    internal virtual float MinimumMinutes => 1f;
+
     /// <summary>Can take this liquid: only its own, empty or not.</summary>
     internal virtual bool Accepts(LiquidType type) => Liquids.Same(Liquid, type);
 

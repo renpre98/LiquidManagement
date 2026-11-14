@@ -11,11 +11,15 @@ Work in progress. Works so far:
   *From* and *Into*: up/down chooses the row, left/right changes the container or the amount. Every container keeps its
   own liquid, so lantern fuel goes only into lantern fuel containers and whale oil only into whale oil containers.
   Afterwards you are back in the inventory where you were.
+- Siphoning car tanks (can be switched off in the settings; then the hose's recipe is hidden too): make a siphon
+  hose at a workbench (2 cured gut, 45 min), open a car's fuel cover and use the filler neck behind it. The transfer
+  menu opens with the tank as the source; choose the container and the amount, a liter a game minute. Each tank holds
+  5-20 l of lantern fuel (settings), found the first time it is siphoned and kept in the save. This came from the
+  Generator Mod; the fuel covers were found by Modelfinder.
 
 Planned:
 
-- Phase 1, fuel: empty Lantern Fuel and Whale Oil containers stay; a transfer menu (source, target, amount); siphoning
-  car tanks with a hose (can be switched off in the settings); refuelling machines of other mods by choice.
+- Phase 1, fuel: refuelling machines of other mods by choice (the Generator Mod's generator first).
 - Phase 2, water: potable or non-potable water in bottles (one at a time, never mixed); carried water limited by the
   bottles' capacity; the game's water bottles stay bottles.
 - Phase 3: refuel the lamp by key, put out fires with water, spawn settings.
@@ -26,7 +30,10 @@ Planned:
 the texts in `Distributable/localizations`: valid JSON for ModComponent, English and German for every key, and a text
 for every `LM_` key used in the code or the item files.
 
-Requires ModComponent and ModSettings.
+The hose's item shell and icons (`Distributable/bundle`) are built with the Unity project in `../LiquidManagementUnity`
+(Unity 6000.0.60f1, `./build.sh`); its look is made at runtime (`src/HoseGeometry.cs`), so no game geometry is shipped.
+
+Requires ModComponent, ModSettings and ModData.
 
 ## Credits
 

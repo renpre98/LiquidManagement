@@ -1,0 +1,15 @@
+{
+    "Name": "LiquidManagement_Hose",
+    "RequiredGear": [
+        {
+            "Item": "GEAR_GutDried",
+            "Count": 2
+        }
+    ],
+    "RequiredCraftingLocation": "Workbench",
+    "RequiresLight": true,
+    "CraftedResult": "GEAR_LM_Hose",
+    "CraftedResultCount": 1,
+    "DurationMinutes": 45,
+    "CraftingAudio": "Play_CraftingCloth"
+}

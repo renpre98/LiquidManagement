@@ -18,11 +18,25 @@ public sealed class LiquidManagementMain : MelonMod
         uConsole.RegisterCommand("lm_transfer", new Action(TransferMenu.Command));
     }
 
+    public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+    {
+        if (sceneName.Contains("MainMenu"))
+        {
+            Save.Reset();
+        }
+        else
+        {
+            // the cars of some regions are in sub-scenes
+            CarTanks.OnSceneLoaded();
+        }
+    }
+
     public override void OnUpdate()
     {
         try
         {
             TransferMenu.Update();
+            CarTanks.Update();
         }
         catch (Exception e)
         {

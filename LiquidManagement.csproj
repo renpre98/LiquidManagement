@@ -55,6 +55,7 @@
     <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/Il2CppInterop.Common.dll" />
     <Reference Include="$(TheLongDarkPath)/MelonLoader/Il2CppAssemblies/*.dll" />
     <Reference Include="$(TheLongDarkPath)/Mods/ModSettings.dll" />
+    <Reference Include="$(TheLongDarkPath)/Mods/ModData.dll" />
   </ItemGroup>
 
   <!--Texts: every Distributable/localizations/*.json must parse (Better Water Management 5.2.0 shipped one with a

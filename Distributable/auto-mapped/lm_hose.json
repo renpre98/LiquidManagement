@@ -1,0 +1,35 @@
+{
+    "ModGenericComponent": {
+        "DisplayNameLocalizationId": "LM_Item_Hose",
+        "DescriptionLocalizatonId": "LM_Item_Hose_Desc",
+        "InventoryActionLocalizationId": "",
+        "WeightKG": 0.3,
+        "DaysToDecay": 0,
+        "MaxHP": 100,
+        "InitialCondition": "Random",
+        "InventoryCategory": "Tool",
+        "PickUpAudio": "Play_SndInvClothLeatherMetal",
+        "PutBackAudio": "Play_SndInvClothLeatherMetal",
+        "StowAudio": "Play_InventoryStow",
+        "WornOutAudio": "",
+        "InspectOnPickup": true,
+        "InspectDistance": 1.4,
+        "InspectAngles": [
+            0,
+            0,
+            0
+        ],
+        "InspectOffset": [
+            0,
+            0,
+            0
+        ],
+        "InspectScale": [
+            1,
+            1,
+            1
+        ],
+        "NormalModel": "",
+        "InspectModel": ""
+    }
+}

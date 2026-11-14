@@ -75,7 +75,7 @@ internal static class InventoryButton
                 // like the game's water drop (Panel_Inventory.OnDrop): the inventory pauses and hides behind the menu
                 // and comes back as it was (selection, filter) when the menu closes (EnablePanelOnExit.Inventory)
                 __instance.PauseAndHide();
-                TransferMenu.Open(vessels, vessel, null, EnablePanelOnExit.Inventory);
+                TransferMenu.Open(vessels, vessel, null, null, EnablePanelOnExit.Inventory);
                 if (!TransferMenu.Active)
                 {
                     __instance.Enable(true, false);
